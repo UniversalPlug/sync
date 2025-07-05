@@ -127,19 +127,21 @@ local espLibrary = {
     return type == "Square" or type == "Text" or type == "Triangle" or type == "Image" or type == "Line" or type == "Circle";
   end
   
-  local function isGui(type)
-    return type == "Frame" or type == "TextLabel" or type == "ImageLabel" or type == "UIStroke" or type == "UICorner" or type == "Highlight"
-  end
-  
   local function create(type, properties)
-    local object = instanceNew(type)
+    local drawing = isDrawing(type);
+    local object = drawing and drawingNew(type) or instanceNew(type);
+  
     if (properties) then
         for i,v in next, properties do
-            object[i] = v
+            object[i] = v;
         end
     end
-    insert(espLibrary.instances, object)
-    return object
+  
+    if (not drawing) then
+        insert(espLibrary.instances, object);
+    end
+  
+    return object;
   end
   
   local function worldToViewportPoint(position)
