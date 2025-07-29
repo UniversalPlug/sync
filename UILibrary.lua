@@ -3662,6 +3662,13 @@ Bracket.Elements = {
 			OptionAsset.MouseButton1Click:Connect(function()
 				Option.Value = not Option.Value
 			end)
+
+			OptionAsset.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.Touch then
+					Option.Value = not Option.Value
+				end
+			end)
+
 			OptionAsset.Title:GetPropertyChangedSignal("TextBounds"):Connect(function()
 				OptionAsset.Title.Size = UDim2.new(1, -(OptionAsset.Layout.ListLayout.AbsoluteContentSize.X + 18), 1, 0)
 			end)
@@ -3822,6 +3829,76 @@ Bracket.Elements = {
 		function Dropdown:Tooltip(Text)
 			Dropdown.Tooltip = Bracket.Elements.Tooltip(DropdownAsset, {Text = Text})
 		end
+
+		DropdownAsset.TouchTap:Connect(function()
+			if not OptionContainerAsset.Visible and OptionContainerAsset.ListLayout.AbsoluteContentSize.Y ~= 0 then
+				Bracket.Utilities.ClosePopUps()
+				OptionContainerAsset.Visible = true
+
+				ContainerRender = RunService.RenderStepped:Connect(function()
+					if not OptionContainerAsset.Visible then ContainerRender:Disconnect() end
+
+					local TabPosition = Window.Asset.TabContainer.AbsolutePosition.Y + Window.Asset.TabContainer.AbsoluteSize.Y
+					local DropdownPosition = DropdownAsset.Background.AbsolutePosition.Y + DropdownAsset.Background.AbsoluteSize.Y
+					if TabPosition < DropdownPosition then
+						OptionContainerAsset.Visible = false
+					end
+
+					TabPosition = Window.Asset.TabContainer.AbsolutePosition.Y
+					DropdownPosition = DropdownAsset.Background.AbsolutePosition.Y
+					if TabPosition > DropdownPosition then
+						OptionContainerAsset.Visible = false
+					end
+
+					OptionContainerAsset.Position = UDim2.fromOffset(
+						DropdownAsset.Background.AbsolutePosition.X + 1,
+						(DropdownAsset.Background.AbsolutePosition.Y + GuiInset.Y) + DropdownAsset.Background.AbsoluteSize.Y + 4
+					)
+					OptionContainerAsset.Size = UDim2.fromOffset(
+						DropdownAsset.Background.AbsoluteSize.X,
+						math.clamp(OptionContainerAsset.ListLayout.AbsoluteContentSize.Y, 14, 84) + 35
+					)
+				end)
+			else
+				OptionContainerAsset.Visible = false
+			end
+		end)
+
+		DropdownAsset.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.Touch then
+				if not OptionContainerAsset.Visible and OptionContainerAsset.ListLayout.AbsoluteContentSize.Y ~= 0 then
+					Bracket.Utilities.ClosePopUps()
+					OptionContainerAsset.Visible = true
+
+					ContainerRender = RunService.RenderStepped:Connect(function()
+						if not OptionContainerAsset.Visible then ContainerRender:Disconnect() end
+
+						local TabPosition = Window.Asset.TabContainer.AbsolutePosition.Y + Window.Asset.TabContainer.AbsoluteSize.Y
+						local DropdownPosition = DropdownAsset.Background.AbsolutePosition.Y + DropdownAsset.Background.AbsoluteSize.Y
+						if TabPosition < DropdownPosition then
+							OptionContainerAsset.Visible = false
+						end
+
+						TabPosition = Window.Asset.TabContainer.AbsolutePosition.Y
+						DropdownPosition = DropdownAsset.Background.AbsolutePosition.Y
+						if TabPosition > DropdownPosition then
+							OptionContainerAsset.Visible = false
+						end
+
+						OptionContainerAsset.Position = UDim2.fromOffset(
+							DropdownAsset.Background.AbsolutePosition.X + 1,
+							(DropdownAsset.Background.AbsolutePosition.Y + GuiInset.Y) + DropdownAsset.Background.AbsoluteSize.Y + 4
+						)
+						OptionContainerAsset.Size = UDim2.fromOffset(
+							DropdownAsset.Background.AbsoluteSize.X,
+							math.clamp(OptionContainerAsset.ListLayout.AbsoluteContentSize.Y, 14, 84) + 35
+						)
+					end)
+				else
+					OptionContainerAsset.Visible = false
+				end
+			end
+		end)
 	end,
 	Colorpicker = function(Parent, Window, Colorpicker)
 		local ColorpickerAsset = Bracket.Assets.Colorpicker()
